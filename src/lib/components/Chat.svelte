@@ -43,8 +43,9 @@
 
 <div class="flex h-full flex-col gap-2 p-2 font-terminus">
 	<div class="flex flex-1 flex-col gap-1 overflow-y-auto text-sm">
-		{#each messages as msg}
+		{#each messages as msg (msg.time)}
 			<div class="flex flex-wrap gap-2">
+				<span class="text-zinc-400">{msg.time}</span>
 				<span class="text-comment">//</span>
 				<span class="text-zinc-400">{msg.name}</span>
 				<span class="text-zinc-100">{msg.text}</span>

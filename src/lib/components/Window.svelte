@@ -5,45 +5,76 @@
 
 	let el: HTMLElement;
 	let dragging = false;
-	let x = $state(40);
-	let y = $state(40);
-	let startX = 0,
-		startY = 0;
+	let x = $state(0);
+	let y = $state(0);
+	let startX = 0, startY = 0;
 	let minimized = $state(false);
+	let detached = $state(false);
+
+	function startDrag(clientX: number, clientY: number) {
+		if (!detached) {
+			const rect = el.getBoundingClientRect();
+			x = rect.left;
+			y = rect.top;
+			detached = true;
+		}
+		dragging = true;
+		startX = clientX - x;
+		startY = clientY - y;
+	}
 
 	function onMousedown(e: MouseEvent) {
-		dragging = true;
-		startX = e.clientX - x;
-		startY = e.clientY - y;
+		startDrag(e.clientX, e.clientY);
+	}
+
+	function onTouchstart(e: TouchEvent) {
+		const t = e.touches[0];
+		startDrag(t.clientX, t.clientY);
 	}
 
 	onMount(() => {
-		const move = (e: MouseEvent) => {
+		const onMousemove = (e: MouseEvent) => {
 			if (!dragging) return;
 			x = e.clientX - startX;
 			y = e.clientY - startY;
 		};
-		const up = () => (dragging = false);
-		window.addEventListener('mousemove', move);
-		window.addEventListener('mouseup', up);
+
+		const onTouchmove = (e: TouchEvent) => {
+			if (!dragging) return;
+			e.preventDefault();
+			const t = e.touches[0];
+			x = t.clientX - startX;
+			y = t.clientY - startY;
+		};
+
+		const stopDrag = () => (dragging = false);
+
+		window.addEventListener('mousemove', onMousemove);
+		window.addEventListener('mouseup', stopDrag);
+		window.addEventListener('touchmove', onTouchmove, { passive: false });
+		window.addEventListener('touchend', stopDrag);
+
 		return () => {
-			window.removeEventListener('mousemove', move);
-			window.removeEventListener('mouseup', up);
+			window.removeEventListener('mousemove', onMousemove);
+			window.removeEventListener('mouseup', stopDrag);
+			window.removeEventListener('touchmove', onTouchmove);
+			window.removeEventListener('touchend', stopDrag);
 		};
 	});
 </script>
 
 <div
 	bind:this={el}
-	class="fixed z-50 flex w-80 flex-col border border-zinc-700 bg-zinc-950"
-	style="left: {x}px; top: {y}px;"
+	class="z-50 flex w-80 flex-col border border-zinc-700 bg-zinc-950 {detached ? 'fixed' : 'relative'}"
+	style={detached ? `left: ${x}px; top: ${y}px;` : ''}
 >
 	<!-- titlebar -->
 	<div
 		role="toolbar"
 		tabindex="0"
 		onmousedown={onMousedown}
-		class="flex cursor-grab items-center justify-between border-b border-zinc-700 px-2 py-1 select-none active:cursor-grabbing"
+		ontouchstart={onTouchstart}
+		class="flex cursor-grab touch-none items-center justify-between border-b border-zinc-700 px-2 py-1 select-none active:cursor-grabbing"
 	>
 		<span class="font-terminus text-sm text-comment">// {title}</span>
 		<button

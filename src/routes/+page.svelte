@@ -8,8 +8,10 @@
 	<img src="/img/catwave.gif" alt="Cat waving" />
 
 	<span class="font-terminus text-3xl text-comment">// КАК ТЫ НАШËЛ ЭТО???</span>
+
+	<Window title="комментики (??)">
+		<Chat />
+	</Window>
 </div>
 
-<Window title="комментики (??)">
-	<Chat />
-</Window>
+
