@@ -7,3 +7,10 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 {@render children()}
+
+<style>
+	:global(body) {
+		background-color: #141315;
+		margin: 0;
+	}
+</style>
