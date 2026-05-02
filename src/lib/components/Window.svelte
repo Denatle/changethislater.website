@@ -5,22 +5,15 @@
 
 	let el: HTMLElement;
 	let dragging = false;
-	let x = $state(0);
-	let y = $state(0);
+	let dx = $state(0);
+	let dy = $state(0);
 	let startX = 0, startY = 0;
 	let minimized = $state(false);
-	let detached = $state(false);
 
 	function startDrag(clientX: number, clientY: number) {
-		if (!detached) {
-			const rect = el.getBoundingClientRect();
-			x = rect.left;
-			y = rect.top;
-			detached = true;
-		}
 		dragging = true;
-		startX = clientX - x;
-		startY = clientY - y;
+		startX = clientX - dx;
+		startY = clientY - dy;
 	}
 
 	function onMousedown(e: MouseEvent) {
@@ -35,16 +28,16 @@
 	onMount(() => {
 		const onMousemove = (e: MouseEvent) => {
 			if (!dragging) return;
-			x = e.clientX - startX;
-			y = e.clientY - startY;
+			dx = e.clientX - startX;
+			dy = e.clientY - startY;
 		};
 
 		const onTouchmove = (e: TouchEvent) => {
 			if (!dragging) return;
 			e.preventDefault();
 			const t = e.touches[0];
-			x = t.clientX - startX;
-			y = t.clientY - startY;
+			dx = t.clientX - startX;
+			dy = t.clientY - startY;
 		};
 
 		const stopDrag = () => (dragging = false);
@@ -65,8 +58,8 @@
 
 <div
 	bind:this={el}
-	class="z-50 flex w-80 flex-col border border-zinc-700 bg-zinc-950 {detached ? 'fixed' : 'relative'}"
-	style={detached ? `left: ${x}px; top: ${y}px;` : ''}
+	class="relative z-50 flex w-80 flex-col border border-zinc-700 bg-zinc-950"
+	style="transform: translate({dx}px, {dy}px);"
 >
 	<!-- titlebar -->
 	<div
