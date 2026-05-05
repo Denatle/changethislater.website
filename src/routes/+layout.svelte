@@ -13,4 +13,12 @@
 		background-color: #141315;
 		margin: 0;
 	}
+	:global(span){
+		font-smooth: never;
+		-webkit-font-smoothing : none;
+	}
+	:global(p){
+		font-smooth: never;
+		-webkit-font-smoothing : none;
+	}
 </style>
